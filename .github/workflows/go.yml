@@ -21,8 +21,14 @@ jobs:
       with:
         go-version: '1.23.2'
 
-    - name: Build
-      run: go build -v ./src/cmd/main.go
+    - name: Install dependencies
+      working-directory: ./src
+      run: go mod tidy
 
-    - name: Test
-      run: go test -v ./src/cmd/main.go
+    - name: Build the project
+      working-directory: ./src
+      run: go build -o time-checker-go ./cmd/bin # Replace "myapp" with your desired output name
+
+    - name: Run tests
+      working-directory: ./src
+      run: go test -v ./...
