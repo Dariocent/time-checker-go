@@ -25,6 +25,9 @@ jobs:
       working-directory: ./src
       run: go mod tidy
 
+    - name: Create bin directory
+      run: mkdir -p src/cmd/bin
+
     - name: Build the project
       working-directory: ./src
       run: go build -o time-checker-go ./cmd/bin # Replace "myapp" with your desired output name
