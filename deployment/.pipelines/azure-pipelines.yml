@@ -1,0 +1,48 @@
+trigger: 
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: BuildTest
+  displayName: 'Build and test job'
+  steps:
+    # Clone from GitHub
+    - script: |
+        git clone https://github.com/Dariocent/time-checker-go
+      displayName: 'Clone time-checker-go repository from GitHub'
+
+    # Set up the Go version
+    - task: GoTool@0
+      inputs:
+        version: '1.23.2'
+
+    # Build the Go project
+    - task: Go@0
+      inputs:
+        command: 'build'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/time-checker-go/src/cmd'
+      displayName: 'Build Go project'
+
+    - task: Go@0
+      inputs:
+        command: 'test'
+        arguments: '-v'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/time-checker-go/src/cmd'
+    - script: |
+        ls -lR
+      displayName: 'Display all files'
+    - task: Docker@2
+      displayName: 'Build and push to container registry'
+      inputs:
+        command: buildAndPush
+        repository: 'time-checker-go'
+        dockerfile: '.build_files/Dockerfile'
+        buildContext: '$(System.DefaultWorkingDirectory)/time-checker-go'
+        containerRegistry: 'cantella-dev-registry'
+        tags: |
+          $(Build.BuildNumber)
+          latest
+
+    

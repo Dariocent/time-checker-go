@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: time-checker-go-deployment
+  namespace: app
+  labels:
+    app: time-checker-go-deployment
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: time-checker-go
+  template:
+    metadata:
+      labels:
+        app: time-checker-go
+    spec:
+      containers:
+      - name: time-checker-go
+        image: cantelladevregistry.azurecr.io/time-checker-go:latest
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: "Exists"
+        effect: "NoSchedule"
+  strategy:
+    rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 1
+    type: RollingUpdate
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: time-checker-go-svc
+  namespace: app
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    app: time-checker-go
+
+  
