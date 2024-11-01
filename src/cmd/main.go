@@ -1,22 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/Dariocent/time-checker-go/cmd/api"
+	"github.com/Dariocent/time-checker-go/db"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file" // Import the file source driver
+	_ "github.com/lib/pq"                                // PostgreSQL driver
 )
 
 func main() {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
-	fmt.Println("The current time is: ", time.Now())
+	// Database connection
+	dataSourceName := "postgres://postgres:password@localhost:5432?sslmode=disable"
+	db := db.NewDB(dataSourceName)
 
-	APIServer := api.NewAPIServer(os.Getenv("ADDR"), nil)
+	APIServer := api.NewAPIServer(os.Getenv("ADDR"), db)
 	err := APIServer.Run()
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)

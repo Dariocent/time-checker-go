@@ -6,6 +6,7 @@ import (
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	//write the current time and the pod name
+	//TODO: avoid calling the same function 6 times
 	w.Write([]byte(
 		"The current time is: " + getEnvInformation()["Time"] + "\n" +
 			"POD_NAME: " + getEnvInformation()["POD_NAME"] + "\n" +
