@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	temp "github.com/Dariocent/time-checker-go/services/time-checker"
+	time_checker "github.com/Dariocent/time-checker-go/services/time-checker"
 	"github.com/Dariocent/time-checker-go/services/user"
 )
 
@@ -24,7 +24,7 @@ func NewAPIServer(addr string, db *sql.DB) *APIServer {
 func (s *APIServer) Run() error {
 	router := http.NewServeMux()
 	// handle api/v1 with strip prefix
-	router.Handle("/api/v1/", http.StripPrefix("/api/v1", http.HandlerFunc(temp.Handler)))
+	router.Handle("GET /api/v1/info", http.StripPrefix("/api/v1", http.HandlerFunc(time_checker.TimeCheckerHandler)))
 
 	//Users
 	// Initialize the store
@@ -33,9 +33,9 @@ func (s *APIServer) Run() error {
 	userHandler := user.UserHandler{UserService: userService}
 
 	// Handle the routes
-	// http.HandleFunc("GET /posts/{id}", handlePost2)
 	router.HandleFunc("POST /api/v1/users", userHandler.CreateUserHandler)
 	router.HandleFunc("GET /api/v1/users", userHandler.ListUsersHandler)
+	router.HandleFunc("DELETE /api/v1/users", userHandler.DeleteUserHandler)
 
 	server := http.Server{
 		Addr:    s.addr,

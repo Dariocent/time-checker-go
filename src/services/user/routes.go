@@ -33,6 +33,23 @@ func (h *UserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusCreated)
 }
 
+func (h *UserHandler) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
+	var user struct {
+		Username string `json:"username"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = h.UserService.DeleteUser(user.Username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 func (h *UserHandler) ListUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := h.UserService.ListUsers()
 	if err != nil {

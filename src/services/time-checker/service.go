@@ -1,4 +1,4 @@
-package temp
+package time_checker
 
 import (
 	"os"
